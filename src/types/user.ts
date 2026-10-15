@@ -135,8 +135,7 @@ export interface GetUsersQueryParams {
 }
 
 // Users filter params
-export interface FilterUsersQueryParams
-  extends GetUsersQueryParams {
+export interface FilterUsersQueryParams extends GetUsersQueryParams {
   key: string;
   value: string;
 }

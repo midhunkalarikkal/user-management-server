@@ -1,9 +1,5 @@
 import axios from "axios";
-import type {
-  Request,
-  Response,
-  NextFunction,
-} from "express";
+import type { Request, Response, NextFunction } from "express";
 import {
   getUsersQuerySchema,
   filterUsersQuerySchema,
@@ -20,22 +16,11 @@ import {
 } from "../services/users.service.js";
 import { AppError } from "../utils/appError.js";
 
-
-export const getUsersController = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const getUsersController = async (req: Request, res: Response, next: NextFunction) => {
   const result = getUsersQuerySchema.safeParse(req.query);
 
   if (!result.success) {
-    return next(
-      new AppError(
-        400,
-        "Invalid query parameters",
-        result.error.flatten().fieldErrors,
-      ),
-    );
+    return next(new AppError(400, "Invalid query parameters", result.error.flatten().fieldErrors));
   }
 
   try {
@@ -46,24 +31,11 @@ export const getUsersController = async (
   }
 };
 
-
-export const filterUsersController = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const result = filterUsersQuerySchema.safeParse(
-    req.query,
-  );
+export const filterUsersController = async (req: Request, res: Response, next: NextFunction) => {
+  const result = filterUsersQuerySchema.safeParse(req.query);
 
   if (!result.success) {
-    return next(
-      new AppError(
-        400,
-        "Invalid filter parameters",
-        result.error.flatten().fieldErrors,
-      ),
-    );
+    return next(new AppError(400, "Invalid filter parameters", result.error.flatten().fieldErrors));
   }
 
   try {
@@ -74,18 +46,11 @@ export const filterUsersController = async (
   }
 };
 
-
-export const getUserByIdController = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const getUserByIdController = async (req: Request, res: Response, next: NextFunction) => {
   const userId = Number(req.params.userId);
 
   if (!Number.isSafeInteger(userId) || userId <= 0) {
-    return next(
-      new AppError(400, "Invalid user ID"),
-    );
+    return next(new AppError(400, "Invalid user ID"));
   }
 
   try {
@@ -96,12 +61,7 @@ export const getUserByIdController = async (
   }
 };
 
-
-
-export const deleteUserController = async (
-  req: Request,
-  res: Response,
-) => {
+export const deleteUserController = async (req: Request, res: Response) => {
   const userId = Number(req.params.userId);
 
   if (!Number.isSafeInteger(userId) || userId <= 0) {
@@ -113,10 +73,7 @@ export const deleteUserController = async (
 
     res.status(200).json(result);
   } catch (error) {
-    if (
-      axios.isAxiosError(error) &&
-      error.response?.status === 404
-    ) {
+    if (axios.isAxiosError(error) && error.response?.status === 404) {
       throw new AppError(404, "User not found");
     }
 
@@ -124,20 +81,11 @@ export const deleteUserController = async (
   }
 };
 
-
-
-export const createUserController = async (
-  req: Request,
-  res: Response,
-) => {
+export const createUserController = async (req: Request, res: Response) => {
   const result = createUserSchema.safeParse(req.body);
 
   if (!result.success) {
-    throw new AppError(
-      400,
-      "Invalid user data",
-      result.error.flatten().fieldErrors,
-    );
+    throw new AppError(400, "Invalid user data", result.error.flatten().fieldErrors);
   }
 
   const user = await createUser(result.data);
@@ -145,12 +93,7 @@ export const createUserController = async (
   res.status(201).json(user);
 };
 
-
-
-export const updateUserController = async (
-  req: Request,
-  res: Response,
-) => {
+export const updateUserController = async (req: Request, res: Response) => {
   const userId = Number(req.params.userId);
 
   if (!Number.isSafeInteger(userId) || userId <= 0) {
@@ -160,11 +103,7 @@ export const updateUserController = async (
   const result = updateUserSchema.safeParse(req.body);
 
   if (!result.success) {
-    throw new AppError(
-      400,
-      "Invalid user data",
-      result.error.flatten().fieldErrors,
-    );
+    throw new AppError(400, "Invalid user data", result.error.flatten().fieldErrors);
   }
 
   try {
@@ -172,10 +111,7 @@ export const updateUserController = async (
 
     res.status(200).json(user);
   } catch (error) {
-    if (
-      axios.isAxiosError(error) &&
-      error.response?.status === 404
-    ) {
+    if (axios.isAxiosError(error) && error.response?.status === 404) {
       throw new AppError(404, "User not found");
     }
 

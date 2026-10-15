@@ -12,7 +12,7 @@ const app = express();
 app.use(requestLogger);
 
 app.use(
-   cors({
+  cors({
     origin: env.CLIENT_URL,
     credentials: true,
   }),

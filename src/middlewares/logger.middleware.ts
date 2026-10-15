@@ -27,9 +27,7 @@ export const requestLogger = pinoHttp({
     }),
   },
 
-  customSuccessMessage: (req, res) =>
-    `${req.method} ${req.url?.split("?")[0]} ${res.statusCode}`,
+  customSuccessMessage: (req, res) => `${req.method} ${req.url?.split("?")[0]} ${res.statusCode}`,
 
-  customErrorMessage: (req, res) =>
-    `${req.method} ${req.url?.split("?")[0]} ${res.statusCode}`,
+  customErrorMessage: (req, res) => `${req.method} ${req.url?.split("?")[0]} ${res.statusCode}`,
 });
