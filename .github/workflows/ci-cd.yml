@@ -5,10 +5,21 @@ on:
     branches:
       - dev
       - main
+    paths-ignore:
+      - "**/*.md"
+      - "LICENSE"
 
   pull_request:
     branches:
       - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - closed
+    paths-ignore:
+      - "**/*.md"
+      - "LICENSE"
 
   workflow_dispatch:
 
@@ -16,7 +27,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: server-${{ github.workflow }}-${{ github.ref }}
+  group: server-${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -30,12 +41,16 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
+        with:
+          version: 10
+          run_install: false
 
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -58,8 +73,12 @@ jobs:
     needs: ci
 
     if: >-
-      github.event_name != 'pull_request' &&
-      github.ref == 'refs/heads/main'
+      github.event_name == 'pull_request' &&
+      github.event.action == 'closed' &&
+      github.event.pull_request.merged == true &&
+      github.event.pull_request.head.ref == 'dev' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.base.ref == 'main'
 
     environment: production
 
@@ -68,9 +87,9 @@ jobs:
         env:
           RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
         run: |
+          test -n "$RENDER_DEPLOY_HOOK_URL"
           curl --fail --show-error --silent \
             --retry 3 \
-            --retry-all-errors \
             --connect-timeout 10 \
             --max-time 30 \
             --output /dev/null \
