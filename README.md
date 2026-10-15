@@ -23,7 +23,7 @@ The server integrates with [DummyJSON](https://dummyjson.com/) to provide sample
 | GET    | `/api/users/filter`  | Filter and search users  |
 | GET    | `/api/users/:userId` | Retrieve user details    |
 | POST   | `/api/users/`        | Create a user            |
-| PATCH  | `/api/users/:userId` | Update user details      |
+| PUT    | `/api/users/:userId` | Update user details      |
 | DELETE | `/api/users/:userId` | Delete a user            |
 
 ## Data Source

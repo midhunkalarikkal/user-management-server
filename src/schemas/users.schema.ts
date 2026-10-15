@@ -197,7 +197,16 @@ export const userFormSchema = z.object({
 
 export const createUserSchema = userFormSchema;
 
-export const updateUserSchema = userFormSchema;
+export const updateUserSchema = userFormSchema.omit({ password: true }).extend({
+  password: z
+    .string()
+    .max(128, "Password must not exceed 128 characters")
+    .refine(
+      (value) => value === "" || value.length >= 6,
+      "Password must contain at least 6 characters",
+    )
+    .optional(),
+});
 
 export type GetUsersParams = z.infer<typeof getUsersQuerySchema>;
 
