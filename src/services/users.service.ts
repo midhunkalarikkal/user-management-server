@@ -133,7 +133,7 @@ export const updateUser = async (
   values: UpdateUserInput,
 ): Promise<Omit<User, "password">> => {
   const { password, ...remainingValues } = values;
-  const payload = password.trim()
+  const payload = password?.trim()
     ? {
         ...remainingValues,
         password: await bcrypt.hash(password, 12),
