@@ -6,6 +6,7 @@ import type {
   CreateUserInput,
   FilterUsersParams,
   GetUsersParams,
+  SearchUsersParams,
   UpdateUserInput,
 } from "../schemas/users.schema.js";
 import bcrypt from "bcryptjs";
@@ -128,6 +129,7 @@ export const createUser = async (values: CreateUserInput): Promise<Omit<User, "p
   return user;
 };
 
+// Update user
 export const updateUser = async (
   userId: number,
   values: UpdateUserInput,
@@ -145,4 +147,20 @@ export const updateUser = async (
   const { password: _password, ...user } = data;
 
   return user;
+};
+
+// Search users
+export const searchUsers = async ({
+  q,
+}: SearchUsersParams): Promise<ApiPaginatedResponse<UsersTableColumn>> => {
+  const { data } = await dummyJsonApi.get<ApiPaginatedResponse<UsersTableColumn>>("/users/search", {
+    params: {
+      q,
+    },
+  });
+
+  return {
+    ...data,
+    users: data.users.map(toTableUser),
+  };
 };

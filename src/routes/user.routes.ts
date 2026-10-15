@@ -6,6 +6,7 @@ import {
   deleteUserController,
   createUserController,
   updateUserController,
+  searchUsersController,
 } from "../controllers/users.controller.js";
 import { authenticate } from "../middlewares/auth.middleware.js";
 
@@ -14,6 +15,8 @@ const usersRouter = Router();
 usersRouter.use(authenticate);
 
 usersRouter.get("/filter", filterUsersController);
+
+usersRouter.get("/search", searchUsersController);
 
 usersRouter.get("/:userId", getUserByIdController);
 
