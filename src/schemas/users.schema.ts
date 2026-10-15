@@ -208,6 +208,10 @@ export const updateUserSchema = userFormSchema.omit({ password: true }).extend({
     .optional(),
 });
 
+export const searchUsersQuerySchema = getUsersQuerySchema.safeExtend({
+  q: z.string().trim().min(1, "Search query is required").max(100),
+});
+
 export type GetUsersParams = z.infer<typeof getUsersQuerySchema>;
 
 export type FilterUsersParams = z.infer<typeof filterUsersQuerySchema>;
@@ -215,3 +219,5 @@ export type FilterUsersParams = z.infer<typeof filterUsersQuerySchema>;
 export type CreateUserInput = z.infer<typeof createUserSchema>;
 
 export type UpdateUserInput = z.infer<typeof updateUserSchema>;
+
+export type SearchUsersParams = z.infer<typeof searchUsersQuerySchema>;

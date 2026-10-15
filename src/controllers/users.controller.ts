@@ -1,10 +1,10 @@
-import axios from "axios";
 import type { Request, Response, NextFunction } from "express";
 import {
   getUsersQuerySchema,
   filterUsersQuerySchema,
   createUserSchema,
   updateUserSchema,
+  searchUsersQuerySchema,
 } from "../schemas/users.schema.js";
 import {
   getUsers,
@@ -13,6 +13,7 @@ import {
   deleteUser,
   createUser,
   updateUser,
+  searchUsers,
 } from "../services/users.service.js";
 import { AppError } from "../utils/appError.js";
 
@@ -61,7 +62,7 @@ export const getUserByIdController = async (req: Request, res: Response, next: N
   }
 };
 
-export const deleteUserController = async (req: Request, res: Response) => {
+export const deleteUserController = async (req: Request, res: Response, next: NextFunction) => {
   const userId = Number(req.params.userId);
 
   if (!Number.isSafeInteger(userId) || userId <= 0) {
@@ -73,27 +74,26 @@ export const deleteUserController = async (req: Request, res: Response) => {
 
     res.status(200).json(result);
   } catch (error) {
-    if (axios.isAxiosError(error) && error.response?.status === 404) {
-      throw new AppError(404, "User not found");
-    }
-
-    throw error;
+    next(error);
   }
 };
 
-export const createUserController = async (req: Request, res: Response) => {
+export const createUserController = async (req: Request, res: Response, next: NextFunction) => {
   const result = createUserSchema.safeParse(req.body);
 
   if (!result.success) {
     throw new AppError(400, "Invalid user data", result.error.flatten().fieldErrors);
   }
 
-  const user = await createUser(result.data);
-
-  res.status(201).json(user);
+  try {
+    const user = await createUser(result.data);
+    res.status(201).json(user);
+  } catch (error) {
+    next(error);
+  }
 };
 
-export const updateUserController = async (req: Request, res: Response) => {
+export const updateUserController = async (req: Request, res: Response, next: NextFunction) => {
   const userId = Number(req.params.userId);
 
   if (!Number.isSafeInteger(userId) || userId <= 0) {
@@ -108,13 +108,23 @@ export const updateUserController = async (req: Request, res: Response) => {
 
   try {
     const user = await updateUser(userId, result.data);
-
     res.status(200).json(user);
   } catch (error) {
-    if (axios.isAxiosError(error) && error.response?.status === 404) {
-      throw new AppError(404, "User not found");
-    }
+    next(error);
+  }
+};
 
-    throw error;
+export const searchUsersController = async (req: Request, res: Response, next: NextFunction) => {
+  const result = searchUsersQuerySchema.safeParse(req.query);
+
+  if (!result.success) {
+    throw new AppError(400, "Invalid search parameters", result.error.flatten().fieldErrors);
+  }
+
+  try {
+    const data = await searchUsers(result.data);
+    res.status(200).json(data);
+  } catch (error) {
+    next(error);
   }
 };
