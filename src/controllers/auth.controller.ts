@@ -1,24 +1,29 @@
 import bcrypt from "bcryptjs";
 import {
-    clearAuthCookies,
-    setAccessCookie,
     setAuthCookies,
+    setAccessCookie,
+    clearAuthCookies,
     verifyRefreshToken,
 } from "../utils/auth-tokens.js";
 import { env } from "../config/env.js";
+import { AppError } from "../utils/appError.js";
 import type { Request, Response } from "express";
 import { loginSchema } from "../schemas/auth.schema.js";
+
+const demoUser = {
+    name: "Demo User",
+    email: env.DEMO_EMAIL,
+};
 
 export const login = async (req: Request, res: Response) => {
     const result = loginSchema.safeParse(req.body);
 
     if (!result.success) {
-        res.status(400).json({
-            success: false,
-            message: "Invalid login data",
-            errors: result.error.flatten().fieldErrors,
-        });
-        return;
+        throw new AppError(
+            400,
+            "Invalid login data",
+            result.error.flatten().fieldErrors,
+        );
     }
 
     const { email, password } = result.data;
@@ -32,11 +37,7 @@ export const login = async (req: Request, res: Response) => {
         email.toLowerCase() === env.DEMO_EMAIL.toLowerCase();
 
     if (!isEmailValid || !isPasswordValid) {
-        res.status(401).json({
-            success: false,
-            message: "Invalid credentials",
-        });
-        return;
+        throw new AppError(401, "Invalid credentials");
     }
 
     setAuthCookies(res);
@@ -44,10 +45,7 @@ export const login = async (req: Request, res: Response) => {
     res.status(200).json({
         success: true,
         message: "Login successful",
-        user: {
-            name: "demo-user",
-            email: env.DEMO_EMAIL,
-        },
+        user: demoUser,
     });
 };
 
@@ -57,26 +55,21 @@ export const getCurrentUser = (
 ) => {
     res.status(200).json({
         success: true,
-        user: {
-            name: "Demo User",
-            email: env.DEMO_EMAIL,
-        },
+        user: demoUser,
     });
 };
 
 export const refresh = (req: Request, res: Response) => {
-
     const token: unknown = req.cookies?.refreshToken;
 
     if (
         typeof token !== "string" ||
         !verifyRefreshToken(token)
     ) {
-        res.status(401).json({
-            success: false,
-            message: "Invalid or expired refresh token",
-        });
-        return;
+        throw new AppError(
+            401,
+            "Invalid or expired refresh token",
+        );
     }
 
     setAccessCookie(res);
