@@ -20,8 +20,9 @@ The server integrates with [DummyJSON](https://dummyjson.com/) to provide sample
 | Method | Endpoint             | Description              |
 | ------ | -------------------- | ------------------------ |
 | GET    | `/api/users`         | Retrieve paginated users |
-| GET    | `/api/users/filter`  | Filter and search users  |
+| GET    | `/api/users/filter`  | Filter users             |
 | GET    | `/api/users/:userId` | Retrieve user details    |
+| GET    | `/api/users/search`  | Search users             |
 | POST   | `/api/users/`        | Create a user            |
 | PUT    | `/api/users/:userId` | Update user details      |
 | DELETE | `/api/users/:userId` | Delete a user            |
