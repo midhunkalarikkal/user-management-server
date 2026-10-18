@@ -23,12 +23,15 @@ const toTableUser = (user: UsersTableColumn): UsersTableColumn => ({
 
 // Get all users with pagination
 export const getUsers = async ({
-  page,
+  skip,
   limit,
   sortBy,
   order,
 }: GetUsersParams): Promise<ApiPaginatedResponse<UsersTableColumn>> => {
-  const skip = (page - 1) * limit;
+  console.log("skip : ", skip);
+  console.log("limit : ", limit);
+  console.log("sortBy : ", sortBy);
+  console.log("order : ", order);
 
   const { data } = await dummyJsonApi.get<ApiPaginatedResponse<UsersTableColumn>>("/users", {
     params: {
@@ -49,20 +52,19 @@ export const getUsers = async ({
 
 // Filter users
 export const filterUsers = async ({
-  page,
+  skip,
   limit,
   sortBy,
   order,
   key,
   value,
 }: FilterUsersParams): Promise<ApiPaginatedResponse<UsersTableColumn>> => {
-  const skip = (page - 1) * limit;
-
   const { data } = await dummyJsonApi.get<ApiPaginatedResponse<UsersTableColumn>>("/users/filter", {
     params: {
       key,
       value,
-      limit: 0,
+      skip,
+      limit,
     },
   });
 

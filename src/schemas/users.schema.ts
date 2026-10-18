@@ -1,12 +1,9 @@
 import { z } from "zod";
 
-const positiveInteger = (defaultValue: number) =>
-  z.coerce.number().int().positive().default(defaultValue);
-
 export const getUsersQuerySchema = z.object({
-  page: positiveInteger(1),
+  skip: z.coerce.number().int().min(0).max(100).default(0),
 
-  limit: positiveInteger(10).pipe(z.number().max(100, "Limit cannot exceed 100")),
+  limit: z.coerce.number().int().min(1).max(100).default(10),
 
   sortBy: z.enum(["firstName", "age", "email"]).optional(),
 

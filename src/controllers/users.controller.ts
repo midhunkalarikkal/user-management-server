@@ -20,6 +20,9 @@ import { AppError } from "../utils/appError.js";
 export const getUsersController = async (req: Request, res: Response, next: NextFunction) => {
   const result = getUsersQuerySchema.safeParse(req.query);
 
+  console.log("req.query : ", req.query);
+  console.log("result : ", result);
+
   if (!result.success) {
     return next(new AppError(400, "Invalid query parameters", result.error.flatten().fieldErrors));
   }
